@@ -38,6 +38,7 @@ namespace GameName1
         //spite
         Texture2D Mine_Texture;
         Texture2D Laser_Texture;
+        Texture2D Explosion_Texture;
 
         //ammo here
         List<Ammo.Laser> laser_list;
@@ -47,7 +48,8 @@ namespace GameName1
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
 
-        
+        //effect
+        List<explosion> boom_list;
 
         //game object
         Player.shooter TTpro;
@@ -85,13 +87,16 @@ namespace GameName1
             //init laser
             laser_list = new List<Ammo.Laser>();
 
+            //special effect
+            boom_list = new List<explosion>();
+
             //
             prevSpawm = TimeSpan.Zero;
             RespawnCD = TimeSpan.FromSeconds(1.0f);
 
             //
             prevFire = TimeSpan.Zero;
-            rateOfFire = TimeSpan.FromSeconds(2);
+            rateOfFire = TimeSpan.FromSeconds(1);
 
             base.Initialize();
         }
@@ -113,7 +118,7 @@ namespace GameName1
             Vector2 playerPosition = new Vector2(GraphicsDevice.Viewport.TitleSafeArea.X,GraphicsDevice.Viewport.TitleSafeArea.Y+ GraphicsDevice.Viewport.TitleSafeArea.Height / 2);
             TTpro.Initialize(playerPosition, playerAnimation);
             Laser_Texture = Content.Load<Texture2D>("Graphics\\laser");
-
+            Explosion_Texture = Content.Load<Texture2D>("Graphics\\Orange_Green_yellow_boom");
 
             Mine_Texture = Content.Load<Texture2D>("Graphics\\mine");
             // TODO: use this.Content to load your game content here
@@ -144,7 +149,7 @@ namespace GameName1
             //enemy update
             UpdateEnemies_list(gameTime);
             UpdateLaser_list(gameTime);
-            UpdateCollision();//air mine disappear when i hit
+            UpdateCollision(gameTime);//air mine disappear when i hit
             base.Update(gameTime);
         }
         
@@ -200,7 +205,13 @@ namespace GameName1
             Ammo.Laser lazor = new Ammo.Laser();
             lazor.Initializer(Laser_Texture, TTpro.Position);
             laser_list.Add(lazor);
-            
+        }
+
+        private void AddBoomEffect(Vector2 Boom_position, GameTime gameTime)
+        {
+            explosion boom = new explosion();
+            boom.Initializer(Explosion_Texture, Boom_position,gameTime.TotalGameTime);
+            boom_list.Add(boom);
         }
 
 
@@ -211,7 +222,6 @@ namespace GameName1
                 if (enemies_list[i].Active == false)
                     enemies_list.RemoveAt(i);
             }
-
         }
         private void RemoveLaser()
         {
@@ -220,7 +230,26 @@ namespace GameName1
                 if (laser_list[i].Active == false)
                     laser_list.RemoveAt(i);
             }
+        }
+        private void RemoveBoomEffect()
+        {
+            for (int i = boom_list.Count - 1; i >= 0; i--)
+            {
+                if (boom_list[i].Active == false)
+                    boom_list.RemoveAt(i);
+            }
+        }
 
+        private void UpdateBoom_list(GameTime gameTime)
+        {
+
+            for (int i = 0; i < boom_list.Count; i++)
+            {
+                boom_list[i].Update(gameTime);
+            }
+
+         
+            RemoveBoomEffect();
         }
 
         private void UpdateLaser_list(GameTime gameTime)
@@ -255,21 +284,37 @@ namespace GameName1
             RemoveEnemies();
         }
 
-        private void UpdateCollision()
+        private void UpdateCollision(GameTime gameTime)
         {
             Rectangle player_rectangle = new Rectangle((int)TTpro.Position.X, (int)TTpro.Position.Y, (int)TTpro.Width, (int)TTpro.Height);
             for (int i=0;i<enemies_list.Count;i++)
             {
                 Enemies.Mine tmp = enemies_list[i];
                 Rectangle mine_range = new Rectangle((int)tmp.Position.X, (int)tmp.Position.Y, (int)tmp.Width, (int)tmp.Height);
+                //player hit mine
                 if (player_rectangle.Intersects(mine_range))
                 {
                     //hit mine
                     tmp.Active = false;
+                    AddBoomEffect(tmp.Position, gameTime);
+                }
+
+                //laser hit mine
+                for (int j=0;j<laser_list.Count;j++)
+                {
+                    Ammo.Laser ltmp = laser_list[j];
+                    Rectangle laser_range = new Rectangle((int)ltmp.Position.X, (int)ltmp.Position.Y, (int)ltmp.Width, (int)ltmp.Height);
+                    if (laser_range.Intersects(mine_range))
+                    {
+                        tmp.Active = false;
+                        ltmp.Active = false;
+                        AddBoomEffect(tmp.Position, gameTime);
+                    }
                 }
             }
-
         }
+
+        
 
         private void DrawEnemies(SpriteBatch spriteBatch)
         {
@@ -286,6 +331,13 @@ namespace GameName1
                 laser_list[i].Draw(spriteBatch);
             }
         }
+        private void DrawBoomEffect(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < boom_list.Count; i++)
+            {
+                boom_list[i].Draw(spriteBatch);
+            }
+        }
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -300,6 +352,7 @@ namespace GameName1
             TTpro.Draw(spriteBatch);
             DrawEnemies(spriteBatch);
             DrawLaser(spriteBatch);
+            DrawBoomEffect(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }

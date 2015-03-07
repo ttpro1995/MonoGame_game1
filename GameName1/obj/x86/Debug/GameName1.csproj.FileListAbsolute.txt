@@ -41,3 +41,4 @@ C:\Users\haha\documents\visual studio 2013\Projects\XNA game\GameName1\GameName1
 C:\Users\haha\documents\visual studio 2013\Projects\XNA game\GameName1\GameName1\bin\Windows\Debug\Content\Sound\gameMusic.xnb
 C:\Users\haha\documents\visual studio 2013\Projects\XNA game\GameName1\GameName1\bin\Windows\Debug\Content\Sound\laserFire.xnb
 C:\Users\haha\documents\visual studio 2013\Projects\XNA game\GameName1\GameName1\bin\Windows\Debug\Content\Sound\menuMusic.xnb
+C:\Users\haha\documents\visual studio 2013\Projects\XNA game\GameName1\GameName1\bin\Windows\Debug\Content\Graphics\Orange_Green_yellow_boom.xnb

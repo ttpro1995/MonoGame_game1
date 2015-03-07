@@ -36,6 +36,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Animation.cs" />
+    <Compile Include="explosion.cs" />
     <Compile Include="Game1.cs" />
     <Compile Include="Laser.cs" />
     <Compile Include="Mine.cs" />
@@ -108,6 +109,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\Graphics\player.xnb">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Content\Graphics\Orange_Green_yellow_boom.xnb">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

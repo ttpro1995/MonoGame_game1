@@ -26,7 +26,7 @@ namespace Enemies
             mine_texture = texture;
             Position = position;
             Active = true;
-            movingSpeed = 6.0f;
+            movingSpeed = 4.0f;
         }
 
         public void Draw(SpriteBatch spiteBatch) {
