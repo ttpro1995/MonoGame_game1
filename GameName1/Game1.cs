@@ -150,6 +150,7 @@ namespace GameName1
             UpdateEnemies_list(gameTime);
             UpdateLaser_list(gameTime);
             UpdateCollision(gameTime);//air mine disappear when i hit
+            UpdateBoom_list(gameTime); //delete boom when it fade
             base.Update(gameTime);
         }
         
@@ -296,7 +297,8 @@ namespace GameName1
                 {
                     //hit mine
                     tmp.Active = false;
-                    AddBoomEffect(tmp.Position, gameTime);
+                   // AddBoomEffect(tmp.Position, gameTime);
+                    //TODO: bigger kaboom
                 }
 
                 //laser hit mine
