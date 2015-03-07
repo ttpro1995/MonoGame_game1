@@ -34,9 +34,15 @@ namespace GameName1
         List<Enemies.Mine> enemies_list;
         TimeSpan prevSpawm;
         TimeSpan RespawnCD; // respawn cooldown
+
+        //spite
         Texture2D Mine_Texture;
         Texture2D Laser_Texture;
+
         //ammo here
+        List<Ammo.Laser> laser_list;
+        TimeSpan prevFire;
+        TimeSpan rateOfFire;
 
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
@@ -76,9 +82,17 @@ namespace GameName1
             //init enemies list 
             enemies_list = new List<Enemies.Mine> ();
 
+            //init laser
+            laser_list = new List<Ammo.Laser>();
+
             //
             prevSpawm = TimeSpan.Zero;
             RespawnCD = TimeSpan.FromSeconds(1.0f);
+
+            //
+            prevFire = TimeSpan.Zero;
+            rateOfFire = TimeSpan.FromSeconds(2);
+
             base.Initialize();
         }
 
@@ -127,6 +141,10 @@ namespace GameName1
             // TODO: Add your update logic here
             TTpro.Update(gameTime);
             UpdatePlayer(gameTime);
+            //enemy update
+            UpdateEnemies_list(gameTime);
+            UpdateLaser_list(gameTime);
+            UpdateCollision();//air mine disappear when i hit
             base.Update(gameTime);
         }
         
@@ -162,9 +180,7 @@ namespace GameName1
 
             TTpro.Position.X = MathHelper.Clamp(TTpro.Position.X, 0, GraphicsDevice.Viewport.Width);
             TTpro.Position.Y = MathHelper.Clamp(TTpro.Position.Y, 0, GraphicsDevice.Viewport.Height);
-            //enemy update
-            UpdateEnemies_list(gameTime);
-            UpdateCollision();//air mine disappear when i hit
+          
         }
 
         private void AddEnemies()
@@ -179,6 +195,15 @@ namespace GameName1
 
         }
 
+        private void AddLaser()
+        {
+            Ammo.Laser lazor = new Ammo.Laser();
+            lazor.Initializer(Laser_Texture, TTpro.Position);
+            laser_list.Add(lazor);
+            
+        }
+
+
         private void RemoveEnemies()
         {
             for (int i = enemies_list.Count -1;i>=0;i--)
@@ -187,6 +212,31 @@ namespace GameName1
                     enemies_list.RemoveAt(i);
             }
 
+        }
+        private void RemoveLaser()
+        {
+            for (int i = laser_list.Count - 1; i >= 0; i--)
+            {
+                if (laser_list[i].Active == false)
+                    laser_list.RemoveAt(i);
+            }
+
+        }
+
+        private void UpdateLaser_list(GameTime gameTime)
+        {
+
+            for (int i = 0; i < laser_list.Count; i++)
+            {
+                laser_list[i].Update(gameTime);
+            }
+
+           if (gameTime.TotalGameTime - prevFire >= rateOfFire)
+            {
+                prevFire = gameTime.TotalGameTime;
+                AddLaser();
+            }
+            RemoveLaser();
         }
 
         private void UpdateEnemies_list(GameTime gameTime)
@@ -203,7 +253,6 @@ namespace GameName1
                     AddEnemies();
                 }
             RemoveEnemies();
-
         }
 
         private void UpdateCollision()
@@ -230,6 +279,14 @@ namespace GameName1
             }
         }
 
+        private void DrawLaser(SpriteBatch spriteBatch)
+        {
+            for (int i = 0; i < laser_list.Count; i++)
+            {
+                laser_list[i].Draw(spriteBatch);
+            }
+        }
+
         /// <summary>
         /// This is called when the game should draw itself.
         /// </summary>
@@ -242,6 +299,7 @@ namespace GameName1
             spriteBatch.Begin();
             TTpro.Draw(spriteBatch);
             DrawEnemies(spriteBatch);
+            DrawLaser(spriteBatch);
             spriteBatch.End();
             base.Draw(gameTime);
         }
